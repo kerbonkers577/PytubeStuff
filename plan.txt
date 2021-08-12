@@ -1,0 +1,3 @@
+We need to use pyTube to access videos and pull them, there is a stream object that manages this in the pyTube library
+
+Next we need to convert stream to an mp3 using ffmpeg
