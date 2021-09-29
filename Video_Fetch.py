@@ -2,7 +2,10 @@ import pytube
 from pytube import Search
 from pytube import YouTube
 import sys
-from pathlib import Path
+import os
+import subprocess
+
+from pytube.request import stream
 
 #Give options to user to pull video, or a collection of videos from a playlist
 # target = input('Input a URL of the video you want converted: ')
@@ -19,29 +22,46 @@ def completedFunc(stream, filepath):
     #Possibly async conversions
 """
 
-def GetVideoInfo (Video):
+def GetVideoInfo (Video):    
     vid = YouTube(Video)
-    # print(vid.title)
-    print(vid.streams.filter(is_dash=True, res="144p").first())
-    # print("Thumbnail: " + yt.thumbnail_url)
+    selectedStream = "None"
+    print(vid.title)
+    if(len(vid.streams.filter(is_dash=True)) > 0):
+        print("Has DASH")
+        if(len(vid.streams.filter(only_audio=True)) > 0):
+            print("Found Audio only stream")
+            selectedStream = vid.streams.filter(is_dash=True,only_audio=True).first()
+
+    elif(len(vid.streams.filter(progressive=True)) > 0):
+        print("Has Progressive")
+    
+    
+    return selectedStream
 
 try:
-    url = 'https://www.youtube.com/watch?v=E0wRCNIerEo'
-    yt = YouTube(url)
+    # testUrl = 'https://www.youtube.com/watch?v=Zj-M9pvQSyo'
+    testUrl = input("FEED ME A YOUTUBE URL:")
+    yt = YouTube(testUrl)
 
     #yt.register_on_progress_callback(progressFunc)
     #yt.streams.filter(only_audio=True)
 
-    # GetVideoInfo(url)
+    selectedStream = GetVideoInfo(testUrl)
     
-    itag = yt.streams.filter(is_dash=True, res="144p").first().itag
+    # itag = yt.streams.filter(res="144p").first().itag
+    # stream = yt.streams.get_by_itag(itag)
+    path = selectedStream.download('Downloads')
+    # print(path)
     
-    stream = yt.streams.get_by_itag(itag)
-    stream.download('Downloads')
-
     #Conversion
     #https://www.ffmpeg.org
-
+    subprocess.run([
+        'ffmpeg',
+        '-i',
+        path,
+        (path + ".mp3")
+    ])
+    
 
     #Delete videos once completed for memory  
 except:
