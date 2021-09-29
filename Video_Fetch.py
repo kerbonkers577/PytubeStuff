@@ -2,7 +2,8 @@ import pytube
 from pytube import Search
 from pytube import YouTube
 import sys
-from pathlib import Path
+import os
+import subprocess
 
 #Give options to user to pull video, or a collection of videos from a playlist
 # target = input('Input a URL of the video you want converted: ')
@@ -21,12 +22,12 @@ def completedFunc(stream, filepath):
 
 def GetVideoInfo (Video):
     vid = YouTube(Video)
-    # print(vid.title)
+    print(vid.title)
     print(vid.streams.filter(is_dash=True, res="144p").first())
     # print("Thumbnail: " + yt.thumbnail_url)
 
 try:
-    url = 'https://www.youtube.com/watch?v=E0wRCNIerEo'
+    url = 'https://www.youtube.com/watch?v=Zj-M9pvQSyo'
     yt = YouTube(url)
 
     #yt.register_on_progress_callback(progressFunc)
@@ -34,14 +35,21 @@ try:
 
     # GetVideoInfo(url)
     
-    itag = yt.streams.filter(is_dash=True, res="144p").first().itag
+    itag = yt.streams.filter(res="144p").first().itag
     
     stream = yt.streams.get_by_itag(itag)
-    stream.download('Downloads')
-
+    path = stream.download('Downloads')
+    print(path)
+    
     #Conversion
     #https://www.ffmpeg.org
-
+    subprocess.run([
+        'ffmpeg',
+        '-i',
+        path,
+        (path + ".mp3")
+    ])
+    
 
     #Delete videos once completed for memory  
 except:
