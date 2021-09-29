@@ -5,6 +5,8 @@ import sys
 import os
 import subprocess
 
+from pytube.request import stream
+
 #Give options to user to pull video, or a collection of videos from a playlist
 # target = input('Input a URL of the video you want converted: ')
 
@@ -20,26 +22,36 @@ def completedFunc(stream, filepath):
     #Possibly async conversions
 """
 
-def GetVideoInfo (Video):
+def GetVideoInfo (Video):    
     vid = YouTube(Video)
+    selectedStream = "None"
     print(vid.title)
-    print(vid.streams.filter(is_dash=True, res="144p").first())
-    # print("Thumbnail: " + yt.thumbnail_url)
+    if(len(vid.streams.filter(is_dash=True)) > 0):
+        print("Has DASH")
+        if(len(vid.streams.filter(only_audio=True)) > 0):
+            print("Found Audio only stream")
+            selectedStream = vid.streams.filter(is_dash=True,only_audio=True).first()
+
+    elif(len(vid.streams.filter(progressive=True)) > 0):
+        print("Has Progressive")
+    
+    
+    return selectedStream
 
 try:
-    url = 'https://www.youtube.com/watch?v=Zj-M9pvQSyo'
-    yt = YouTube(url)
+    # testUrl = 'https://www.youtube.com/watch?v=Zj-M9pvQSyo'
+    testUrl = input("FEED ME A YOUTUBE URL:")
+    yt = YouTube(testUrl)
 
     #yt.register_on_progress_callback(progressFunc)
     #yt.streams.filter(only_audio=True)
 
-    # GetVideoInfo(url)
+    selectedStream = GetVideoInfo(testUrl)
     
-    itag = yt.streams.filter(res="144p").first().itag
-    
-    stream = yt.streams.get_by_itag(itag)
-    path = stream.download('Downloads')
-    print(path)
+    # itag = yt.streams.filter(res="144p").first().itag
+    # stream = yt.streams.get_by_itag(itag)
+    path = selectedStream.download('Downloads')
+    # print(path)
     
     #Conversion
     #https://www.ffmpeg.org
