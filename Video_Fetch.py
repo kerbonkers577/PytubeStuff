@@ -4,23 +4,15 @@ from pytube import YouTube
 import sys
 import os
 import subprocess
-
+import re
 from pytube.request import stream
-
-#Give options to user to pull video, or a collection of videos from a playlist
-# target = input('Input a URL of the video you want converted: ')
-
 
 #Upon fetch, using stream, indicate progress
 def progressFunc(stream, chunk, bytesRem):
     print(bytesRem)
 
-#Take videos and convert them to .mp3 files
-"""
-def completedFunc(stream, filepath):
-    #Run conversion on completetion
-    #Possibly async conversions
-"""
+#DASH = Audio and video codec seperate
+#Progressive = Audio and video together 
 
 def GetVideoInfo (Video):    
     vid = YouTube(Video)
@@ -34,24 +26,27 @@ def GetVideoInfo (Video):
 
     elif(len(vid.streams.filter(progressive=True)) > 0):
         print("Has Progressive")
-    
-    
+        if(len(vid.streams.filter(progressive=True)) > 0):
+            print("Found Audio only stream")
+            selectedStream = vid.streams.filter(is_progressive=True).first()
     return selectedStream
 
+def TrimName(videoName):
+    newName = re.sub(".mp4", "", videoName)
+    return newName
+
 try:
-    # testUrl = 'https://www.youtube.com/watch?v=Zj-M9pvQSyo'
-    testUrl = input("FEED ME A YOUTUBE URL:")
-    yt = YouTube(testUrl)
-
-    #yt.register_on_progress_callback(progressFunc)
-    #yt.streams.filter(only_audio=True)
-
-    selectedStream = GetVideoInfo(testUrl)
     
-    # itag = yt.streams.filter(res="144p").first().itag
-    # stream = yt.streams.get_by_itag(itag)
+    ytUrl = input("FEED ME A YOUTUBE URL:")
+    yt = YouTube(ytUrl)
+
+    selectedStream = GetVideoInfo(ytUrl)
+    
     path = selectedStream.download('Downloads')
-    # print(path)
+    
+    #Cleaning off the .mp4
+    os.rename(path, TrimName(path))
+    path = TrimName(path)
     
     #Conversion
     #https://www.ffmpeg.org
@@ -62,7 +57,7 @@ try:
         (path + ".mp3")
     ])
     
-
-    #Delete videos once completed for memory  
+    #Delete videos once completed for memory
+    os.remove(path)  
 except:
     print(sys.exc_info())
