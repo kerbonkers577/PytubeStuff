@@ -35,29 +35,31 @@ def TrimName(videoName):
     newName = re.sub(".mp4", "", videoName)
     return newName
 
-try:
-    
-    ytUrl = input("FEED ME A YOUTUBE URL:")
-    yt = YouTube(ytUrl)
+def DownloadVideo(ytUrl):
+    try:
+        
+        # ytUrl = input("FEED ME A YOUTUBE URL:")
+        yt = YouTube(ytUrl)
 
-    selectedStream = GetVideoInfo(ytUrl)
-    
-    path = selectedStream.download('Downloads')
-    
-    #Cleaning off the .mp4
-    os.rename(path, TrimName(path))
-    path = TrimName(path)
-    
-    #Conversion
-    #https://www.ffmpeg.org
-    subprocess.run([
-        'ffmpeg',
-        '-i',
-        path,
-        (path + ".mp3")
-    ])
-    
-    #Delete videos once completed for memory
-    os.remove(path)  
-except:
-    print(sys.exc_info())
+        selectedStream = GetVideoInfo(ytUrl)
+        
+        path = selectedStream.download('Downloads')
+        
+        #Cleaning off the .mp4
+        os.rename(path, TrimName(path))
+        path = TrimName(path)
+        
+        #Conversion
+        #https://www.ffmpeg.org
+        subprocess.run([
+            'ffmpeg',
+            '-i',
+            path,
+            (path + ".mp3")
+        ])
+        
+        #Delete videos once completed for memory
+        os.remove(path)
+        return path + '.mp3'
+    except:
+        print(sys.exc_info())
