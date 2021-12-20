@@ -37,8 +37,6 @@ def TrimName(videoName):
 
 def DownloadVideo(ytUrl):
     try:
-        
-        # ytUrl = input("FEED ME A YOUTUBE URL:")
         yt = YouTube(ytUrl)
 
         selectedStream = GetVideoInfo(ytUrl)
