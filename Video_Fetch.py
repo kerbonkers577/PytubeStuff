@@ -1,5 +1,4 @@
 import pytube
-from pytube import Search
 from pytube import YouTube
 import sys
 import os

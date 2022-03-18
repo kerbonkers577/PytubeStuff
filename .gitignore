@@ -8,3 +8,4 @@ plan.txt
 
 #other
 /venv
+/__pycache__
