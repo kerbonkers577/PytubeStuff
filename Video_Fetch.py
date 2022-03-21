@@ -34,6 +34,10 @@ def TrimName(videoName):
     newName = re.sub(".mp4", "", videoName)
     return newName
 
+def GetVideoConvFileName(Video):
+    vid = YouTube(Video)
+    return vid.title + '.mp3'
+
 def DownloadVideo(ytUrl):
     try:
         yt = YouTube(ytUrl)
